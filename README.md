@@ -2,15 +2,15 @@
 
 I would like to have static CPP libraries under next demands:
 
- * The code must be compilable with C++ 20 standard (gcc, clang, msvc compiler)
- * It must be easy to include code
- * cmake is the main way of integration
- * Code must be tested with unit tests
- * Library API must be documented
  * Library must contain "How to" examples of the library code usage
+ * Code must be tested with unit tests
+ * The code must be compilable with C++ 20 standard (gcc, clang, msvc compiler)
+ * It must be easy to include code and cmake is the main way of integration
+ * Library API must be documented
+---
  * This repository contains a script to generate the base code for such a library
-   * windows [**winscript**](scripts/spplibgen.cmd)
-   * linux [**linscript**](scripts/spplibgen.sh)
+   * windows [**winscript**](scripts/cpplibgen.cmd)
+   * linux [**linscript**](scripts/cpplibgen.sh)
 
 ---
 
@@ -29,31 +29,32 @@ I would like to have static CPP libraries under next demands:
 
 | Requirement         | Documentation Link                     |
 |---------------------|----------------------------------------|
-| Unit Tests          | [Unit Tests Documentation](doc/unit_tests.md) |
 | How To              | [How To Documentation](doc/how_to.md) |
+| Unit Tests          | [Unit Tests Documentation](doc/unit_tests.md) |
 | Integration Tests   | [Integration Tests Documentation](doc/integration_tests.md) |
-| Comments            | [Comments Guidelines](doc/comments.md) |
+| API Documentation   | [Comments Guidelines](doc/comments.md) |
 
 ---
 
 # Code Rules
 
-1. Use consistent indentation and spacing across all files.  
-2. Avoid using global variables; prefer encapsulation when possible.  
-3. Ensure proper error handling and logging mechanisms.
+1. Use consistent indentation and spacing across all files;
+2. Avoid using global variables; prefer encapsulation when possible;
+3. Ensure proper error handling and logging mechanisms and document possible cases properly;
 
 ---
 
 # Naming Conventions
 
-- **Outer Namespace:** Use PascalCase for namespaces representing larger modules or systems (e.g., `DataProcessing`).
-- **Inner Namespace:** Use camelCase for inner namespaces that are smaller subdivisions (e.g., `coreUtilities`).
-- **Class and Methods:** Classes use PascalCase (e.g., `UserManager`), while methods use camelCase (e.g., `createUser`).
-- **Functions:** Functions follow camelCase and should convey their purpose (e.g., `getUserInfo`).
-
+- There are **two namespaces** supposed
+  - **Outer Namespace:** As a strong recommendation: Use either your github name, or organization name (e.g., `zproksi` is the outer namespace for this repo autor). namespace should be always in lower case;
+  - **Inner Namespace:** Use purpose of the class(es) functions for the inner name namespaces (e.g., `zproksi::profiler` for the class(es) which can be used for time measurement and code speed profiling);
+- **Classes, functions, static variables, constants, defines:** No strict rules, however as a common recommendation: use unified style for all names from your outer namespace. For example PascalCase for classes and camelCase for methods;
 ---
 
 # Compliance
+
+*This section is under construction and should not be taken into account for now*
 
 | Image                              | Description                     |
 |------------------------------------|---------------------------------|
@@ -64,6 +65,8 @@ I would like to have static CPP libraries under next demands:
 ---
 
 # List of Libraries by Licensing
+
+*This section is under construction and should not be taken into account for now*
 
 | License Type           | Documentation Link                     |
 |------------------------|----------------------------------------|
