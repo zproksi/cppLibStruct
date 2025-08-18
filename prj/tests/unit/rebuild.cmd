@@ -9,7 +9,6 @@ set BITNESS=64
 set BITNESS64=ON
 set MODE=Release
 set PROJECT=dummyname
-set RETURN_VAL=0
 
 goto :scriptstart
 

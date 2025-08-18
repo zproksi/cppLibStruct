@@ -19,6 +19,10 @@ CPPLG_H_FILENAME=""
 # main cpp file for the project will be generated from the name of CPPLG_H_FILENAME
 CPPLG_CPP_FILENAME=""
 
+# to set tabulation size
+CPPLG_TABULATION_SIZE=4
+CPPLG_TABULATION="    "
+
 # to monitor errors
 CPPLG_ERROR=0
 
@@ -32,7 +36,7 @@ manual()
     divisor
     echo "  To build new library draft use"
     echo "Execute:"
-    echo "\"./${SCRIPT_NAME}\"  [-w folder_name] [-o outer_namespace] [-i inner_namespace] [-n filename]"
+    echo "\"./${SCRIPT_NAME}\"  [-w folder_name] [-o outer_namespace] [-i inner_namespace] [-n filename] <-t 2|3|5>"
     echo ""
     echo "-w   <folder_name>"
     echo "          Specifies the target folder where the library code will be generated"
@@ -46,7 +50,28 @@ manual()
     echo "            * If missing, .h will be appended automatically"
     echo "            * The corresponding source (<filename>.cpp) and test (test_<filename>.cpp) filenames"
     echo "               will be derived from this header name"
+    echo "-t   2|3|5"
+    echo "          Specifies the indentation size in whitespaces"
+    echo "            * if -t option is skipped - 4 whitespaces is default value"
+    echo "            * script accepts only 2, 3 and 5 values"
     divisor
+}
+
+define_tabulations() {
+    case "${CPPLG_TABULATION_SIZE}" in
+        2)
+            CPPLG_TABULATION="  "
+            ;;
+        3)
+            CPPLG_TABULATION="   "
+            ;;
+        5)
+            CPPLG_TABULATION="     "
+            ;;
+        *)
+            CPPLG_TABULATION="    "
+            ;;
+    esac
 }
 
 parse_arguments() {
@@ -95,6 +120,17 @@ parse_arguments() {
                     return 1
                 fi
                 ;;
+            "-t")
+                # Check if next argument exists and isn't another option
+                if (( kk+1 < ${#args[@]} )) && [[ ${args[kk+1]} != -* ]]; then
+                    CPPLG_TABULATION_SIZE="${args[kk+1]}"
+                    ((++kk))  # Skip next argument since we've processed it
+                    define_tabulations
+                else
+                    manual
+                    return 1
+                fi
+                ;;
             "-h")
                 manual
                 return 1
@@ -120,6 +156,30 @@ has_whitespace_or_dot() {
         CPPLG_ERROR=0  # Does NOT contain whitespace or dot
     fi
 }
+
+# Function to replace strings in all files recursively
+replace_strings() {
+    local folder="$1"
+    local search="$2"
+    local replace="$3"
+
+    find "${folder}" -type f -print0 | while IFS= read -r -d '' file; do
+        sed -i "s|${search}|${replace}|g" "${file}"
+    done
+
+}
+
+# Function to replace strings in all files recursively
+set_tabulations() {
+    local folder="$1"
+    local replace="$2"
+
+    find "${folder}" -type f -print0 | while IFS= read -r -d '' file; do
+        sed -i -E "s/^( {4})+/$(echo -n "${replace}" | sed 's/[\/&]/\\&/g')/g" "${file}"
+    done
+
+}
+
 
 # script logic entry point
 parse_arguments "$@"
@@ -172,6 +232,20 @@ mkdir -p "${CPPLG_WHERE}" || {
     echo "Error: Failed to create directory '${CPPLG_WHERE}'" >&2
     exit 1
 }
+
+# copy sources
+cp -r ./prj/. "${CPPLG_WHERE}/"
+
+# rename files
+mv "${CPPLG_WHERE}/dummyname.cpp" "${CPPLG_WHERE}/${CPPLG_H_FILENAME}.cpp"
+mv "${CPPLG_WHERE}/dummyname.h" "${CPPLG_WHERE}/${CPPLG_H_FILENAME}.h"
+mv "${CPPLG_WHERE}/tests/unit/test_dummyname.cpp" "${CPPLG_WHERE}/tests/unit/test_${CPPLG_H_FILENAME}.cpp"
+
+replace_strings "${CPPLG_WHERE}/" outer  ${CPPLG_OUTER_NAMESPACE}
+replace_strings "${CPPLG_WHERE}/" inner  ${CPPLG_INNER_NAMESPACE}
+replace_strings "${CPPLG_WHERE}/" dummyname  ${CPPLG_H_FILENAME}
+
+set_tabulations "${CPPLG_WHERE}/" "${CPPLG_TABULATION}"
 
 #list of files in the root folder:
 # CMakeLists.txt
