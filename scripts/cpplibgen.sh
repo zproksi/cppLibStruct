@@ -26,6 +26,7 @@ CPPLG_TABULATION="    "
 # to monitor errors
 CPPLG_ERROR=0
 
+# contains script path after being detected
 CPPLG_SCRIPT_PATH=""
 
 divisor() {
