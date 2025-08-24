@@ -26,6 +26,8 @@ CPPLG_TABULATION="    "
 # to monitor errors
 CPPLG_ERROR=0
 
+CPPLG_SCRIPT_PATH=""
+
 divisor() {
     echo -e "\033[35m----------------------------------\033[0m"
 }
@@ -157,6 +159,17 @@ has_whitespace_or_dot() {
     fi
 }
 
+# get this script path to find the prj folder
+get_script_path() {
+    local CWDLocal=$(pwd)
+    # Handle symbolic links
+    if [ -L "$0" ]; then
+        CPPLG_SCRIPT_PATH="$( dirname "$( readlink -f "$0" )" )"
+    else
+        CPPLG_SCRIPT_PATH="$( cd "$( dirname "$0" )" >/dev/null 2>&1 && pwd )"
+    fi
+    cd ${CWDLocal}
+}
 # Function to replace strings in all files recursively
 replace_strings() {
     local folder="$1"
@@ -180,6 +193,8 @@ set_tabulations() {
 
 }
 
+# get path of the script
+get_script_path
 
 # script logic entry point
 parse_arguments "$@"
@@ -234,7 +249,7 @@ mkdir -p "${CPPLG_WHERE}" || {
 }
 
 # copy sources
-cp -r ./prj/. "${CPPLG_WHERE}/"
+cp -r ${CPPLG_SCRIPT_PATH}/../prj/. "${CPPLG_WHERE}/"
 
 # rename files
 mv "${CPPLG_WHERE}/dummyname.cpp" "${CPPLG_WHERE}/${CPPLG_H_FILENAME}.cpp"
